@@ -8,31 +8,22 @@
 #define SERIALBAUDRATE 9600
 
 #define STEERINGPIN 9
-//#define STRAIGHT 105
-//#define MAXRIGHT 141
-//#define MAXLEFT 71
-#define STRAIGHT 1640
-#define MAXRIGHT 1910
-#define MAXLEFT 1370
+#define STRAIGHT 1640 // 105°
+#define MAXRIGHT 1910 // 141°
+#define MAXLEFT 1370 // 71°
 #define STEERINGRESPONSE 10
 Servo steeringservo;
+int steering = STRAIGHT;
 
 #define THROTTLEPIN 10
-//#define NEUTRAL 86
-//#define MAXFORWARD 114
-//#define MINFORWARD 96
-//#define MAXREVERSE 61
-//#define MINREVERSE 81
-#define NEUTRAL 1490
-#define MAXTHROTTLE 1770
-#define MINFORWARD 1540
-#define MINREVERSE 1390
-#define MINTHROTTLE 1200
+#define NEUTRAL 1490 // 86°
+#define MAXTHROTTLE 1770 // 114°
+#define MINFORWARD 1540 // 96°
+#define MINREVERSE 1390 // 81°
+#define MINTHROTTLE 1200 // 61°
 #define THROTTLERESPONSE 10
 Servo throttleservo;
-
 int throttle = NEUTRAL;
-int steering = STRAIGHT;
 
 StaticJsonBuffer<200> jsonBuffer;
 
@@ -50,7 +41,7 @@ void setup()
   writeservo(throttleservo, throttle);
 }
 
-int steer_right()
+void steer_right()
 { 
   if (steering < MAXRIGHT)
   {
@@ -59,7 +50,7 @@ int steer_right()
   }
 }
 
-int steer_left()
+void steer_left()
 {
   if (steering > MAXLEFT)
   {
@@ -69,7 +60,7 @@ int steer_left()
   
 }
 
-int throttle_up()
+void throttle_up()
 {
   if (throttle < MAXTHROTTLE)
   {
@@ -78,7 +69,7 @@ int throttle_up()
   }
 }
 
-int throttle_down()
+void throttle_down()
 {
   if (throttle > MINTHROTTLE)
   {
