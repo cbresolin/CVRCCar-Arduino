@@ -25,7 +25,7 @@ int steering = STRAIGHT;
 Servo throttleservo;
 int throttle = NEUTRAL;
 
-StaticJsonBuffer<200> jsonBuffer;
+StaticJsonBuffer<100> jsonBuffer;
 
 void setup()
 {
@@ -94,31 +94,54 @@ void loop()
 {
     if (Serial.available())
     { 
+      char json_buffer[60] = "";
+      int pan;
+      int tilt;
+
       // If anything comes in Serial (USB)
-      char input = Serial.read();
-  
-      switch (input)
+      Serial.readBytesUntil("#", json_buffer, 60);
+      
+      // Test if parsing succeeds.
+      // Example: {"pan":1543,"tilt":1774,"throttle":1390,"steering":1910}#
+      JsonObject& root = jsonBuffer.parseObject(json_buffer);
+      if (!root.success())
       {
-        case '4':
-          steer_left();
-          break;
-        case '6':
-          steer_right();
-          break;
-          case '-':
-          throttle_down();
-          break;
-        case '+':
-          throttle_up();
-          break;
-        default: 
-          // Nothing
-        break;
+        Serial.println("Parsing failed");
+        return;
       }
+      else
+      {
+        // Parse data
+        pan = root["pan"];
+        tilt = root["tilt"];
+        throttle = root["throttle"];
+        steering = root["steering"];
+      }  
+      
+//      switch (input)
+//      {
+//        case '4':
+//          steer_left();
+//          break;
+//        case '6':
+//          steer_right();
+//          break;
+//          case '-':
+//          throttle_down();
+//          break;
+//        case '+':
+//          throttle_up();
+//          break;
+//        default: 
+//          // Nothing
+//        break;
+//      }
       
       // Debug
-      Serial.print("Input = ");
-      Serial.print(input); 
+      Serial.print("Pan = ");
+      Serial.print(pan);
+      Serial.print(", Tilt = ");
+      Serial.print(tilt);
       Serial.print(", Steering = ");
       Serial.print(steering);
       Serial.print(", Throttle = ");
