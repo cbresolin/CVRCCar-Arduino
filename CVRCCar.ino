@@ -23,8 +23,6 @@ Servo steeringservo;
 #define THROTTLERESPONSE 10
 Servo throttleservo;
 
-StaticJsonBuffer<100> jsonBuffer;
-
 void setup()
 {
   // initialize serial communication:
@@ -57,40 +55,29 @@ void writeservo(Servo servo, int time)
 
 // the loop routine runs over and over again forever:
 void loop()
-{
-    if (Serial.available())
-    { 
-      char json_buffer[60] = "";
-      int pan;
-      int tilt;
-      int steering;
-      int throttle;
-
+{    
+    while (Serial.available())
+    {  
+      char serialbuffer[33] = "";
+      StaticJsonBuffer<33> jsonBuffer;
+      
       // If anything comes in Serial (USB)
-      Serial.readBytesUntil("#", json_buffer, 60);
+      Serial.readBytes(serialbuffer, sizeof(serialbuffer));
       
       // Test if parsing succeeds.
-      // Example: {"pan":1543,"tilt":1774,"throttle":1490,"steering":1640}#
-      JsonObject& root = jsonBuffer.parseObject(json_buffer);
+      // Example: {"throttle":1490,"steering":1640}
+      JsonObject& root = jsonBuffer.parseObject(serialbuffer);
       if (!root.success())
       {
-        Serial.println("Parsing failed");
+        // Nothing is sent
         return;
-      }
-      else
-      {
-        // Parse data
-        pan = root["pan"];
-        tilt = root["tilt"];
-        throttle = root["throttle"];
-        steering = root["steering"];
       }
 
       // Act on steering
-      set_steering(steering);
+      set_steering(root["steering"]);
 
       // Act on throttle
-      set_throttle(throttle);
+      set_throttle(root["throttle"]);
     }
 }
 
