@@ -59,7 +59,8 @@ void loop()
     while (Serial.available())
     {  
       char serialbuffer[33] = "";
-      StaticJsonBuffer<33> jsonBuffer;
+      // StaticJsonBuffer<33> jsonBuffer;
+      DynamicJsonBuffer jsonBuffer = "";
       
       // If anything comes in Serial (USB)
       Serial.readBytes(serialbuffer, sizeof(serialbuffer));
@@ -72,12 +73,14 @@ void loop()
         // Nothing is sent
         return;
       }
+      else
+      {
+        // Act on steering
+        set_steering(root["steering"]);
 
-      // Act on steering
-      set_steering(root["steering"]);
-
-      // Act on throttle
-      set_throttle(root["throttle"]);
+        // Act on throttle
+        set_throttle(root["throttle"]);
+      }
     }
 }
 
