@@ -7,14 +7,21 @@
 
 #define SERIALBAUDRATE 9600
 
-#define STEERINGPIN 9
+#define PANPIN 9
+#define PANSTRAIGHT 1680
+#define PANMAXRIGHT 2400
+#define PANMAXLEFT 900
+#define PANRESPONSE 10
+Servo panservo;
+
+#define STEERINGPIN 10
 #define STRAIGHT 1640 // 105°
 #define MAXRIGHT 1910 // 141°
 #define MAXLEFT 1370 // 71°
 #define STEERINGRESPONSE 10
 Servo steeringservo;
 
-#define THROTTLEPIN 10
+#define THROTTLEPIN 11
 #define NEUTRAL 1490 // 86°
 #define MAXTHROTTLE 1770 // 114°
 #define MINFORWARD 1540 // 96°
@@ -28,6 +35,10 @@ void setup()
   // initialize serial communication:
   Serial.begin(SERIALBAUDRATE);
   
+  // attaches pan servo
+  panservo.attach(PANPIN);
+  set_pan(PANSTRAIGHT);
+  
   // attaches steering servo
   steeringservo.attach(STEERINGPIN);
   set_steering(STRAIGHT);
@@ -35,6 +46,11 @@ void setup()
   // attaches throttle servo
   throttleservo.attach(THROTTLEPIN);
   set_throttle(NEUTRAL);
+}
+
+void set_pan(int pwm)
+{ 
+  writeservo(panservo, pwm);
 }
 
 void set_steering(int pwm)
@@ -58,15 +74,14 @@ void loop()
 {    
     while (Serial.available())
     {  
-      char serialbuffer[33] = "";
-      // StaticJsonBuffer<33> jsonBuffer;
+      char serialbuffer[44] = "";
       DynamicJsonBuffer jsonBuffer = "";
       
       // If anything comes in Serial (USB)
       Serial.readBytes(serialbuffer, sizeof(serialbuffer));
       
       // Test if parsing succeeds.
-      // Example: {"throttle":1490,"steering":1640}
+      // Example: {"pan":1680,"steering":1640,"throttle":1490}
       JsonObject& root = jsonBuffer.parseObject(serialbuffer);
       if (!root.success())
       {
@@ -75,6 +90,9 @@ void loop()
       }
       else
       {
+        // Act on pan
+        set_pan(root["pan"]);
+        
         // Act on steering
         set_steering(root["steering"]);
 
