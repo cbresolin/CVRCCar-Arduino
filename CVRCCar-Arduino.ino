@@ -7,7 +7,7 @@
 
 #define SERIALBAUDRATE 9600
 
-#define PANPIN 9
+#define PANPIN 11
 #define PANSTRAIGHT 1680
 #define PANMAXRIGHT 2400
 #define PANMAXLEFT 900
@@ -21,7 +21,7 @@ Servo panservo;
 #define STEERINGRESPONSE 10
 Servo steeringservo;
 
-#define THROTTLEPIN 11
+#define THROTTLEPIN 9
 #define NEUTRAL 1490 // 86°
 #define MAXTHROTTLE 1770 // 114°
 #define MINFORWARD 1540 // 96°
