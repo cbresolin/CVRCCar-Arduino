@@ -8,9 +8,9 @@
 #define SERIALBAUDRATE 9600
 
 #define PANPIN 11
-#define PANSTRAIGHT 1680
-#define PANMAXRIGHT 2400
-#define PANMAXLEFT 900
+#define PANSTRAIGHT 1385 // 82°
+#define PANMAXRIGHT 2250 // 167°
+#define PANMAXLEFT 565 // 2°
 #define PANRESPONSE 10
 Servo panservo;
 
@@ -81,7 +81,7 @@ void loop()
       Serial.readBytes(serialbuffer, sizeof(serialbuffer));
       
       // Test if parsing succeeds.
-      // Example: {"pan":1680,"steering":1640,"throttle":1490}
+      // Example: {"pan":1385,"steering":1640,"throttle":1490}
       JsonObject& root = jsonBuffer.parseObject(serialbuffer);
       if (!root.success())
       {
