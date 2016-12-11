@@ -74,14 +74,14 @@ void loop()
 {    
     while (Serial.available())
     {  
-      char serialbuffer[44] = "";
-      DynamicJsonBuffer jsonBuffer = "";
-      
+      char serialbuffer[45] = "";
+      DynamicJsonBuffer jsonBuffer = "";  
+
       // If anything comes in Serial (USB)
-      Serial.readBytes(serialbuffer, sizeof(serialbuffer));
-      
+      Serial.readBytesUntil(';', serialbuffer, sizeof(serialbuffer));
+            
       // Test if parsing succeeds.
-      // Example: {"pan":1385,"steering":1640,"throttle":1490}
+      // Example: {"pan":1385,"steering":1640,"throttle":1490};
       JsonObject& root = jsonBuffer.parseObject(serialbuffer);
       if (!root.success())
       {
