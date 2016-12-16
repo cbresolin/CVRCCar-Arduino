@@ -75,7 +75,7 @@ void loop()
     while (Serial.available())
     {  
       char serialbuffer[45] = "";
-      DynamicJsonBuffer jsonBuffer = "";  
+      DynamicJsonBuffer jsonBuffer;  
 
       // If anything comes in Serial (USB)
       Serial.readBytesUntil(';', serialbuffer, sizeof(serialbuffer));
