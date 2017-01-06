@@ -3,40 +3,25 @@
 */
 
 #include <Servo.h>
-#include <SoftwareSerial.h>
 #include <ArduinoJson.h>
 
 #define SERIALBAUDRATE 9600
-#define PAYLOADSIZE 3
 
-#define RXPIN 2
-#define TXPIN 4
-SoftwareSerial btserial(RXPIN, TXPIN);
-
-#define PANPIN 11
+#define PANPIN 9
 #define PANSTRAIGHT 1385 // 82°
-#define PANMAXRIGHT 2250 // 167°
-#define PANMAXLEFT 565 // 2°
 Servo panservo;
 
 #define STEERINGPIN 10
 #define STRAIGHT 1640 // 105°
-#define MAXRIGHT 1910 // 141°
-#define MAXLEFT 1370 // 71°
 Servo steeringservo;
 
-#define THROTTLEPIN 9
+#define THROTTLEPIN 11
 #define NEUTRAL 1490 // 86°
-#define MAXTHROTTLE 1770 // 114°
-#define MINFORWARD 1540 // 96°
-#define MINREVERSE 1390 // 81°
-#define MINTHROTTLE 1200 // 61°
 Servo throttleservo;
 
 void setup()
 {
   // initialize BT serial communication:
-  btserial.begin(SERIALBAUDRATE);
   Serial.begin(SERIALBAUDRATE);
   
   // attaches pan servo
@@ -76,18 +61,13 @@ void writeservo(Servo servo, int time)
 // the loop routine runs over and over again forever:
 void loop()
 {
-  if (btserial.available())
+  if (Serial.available())
   {
     char serialbuffer[45] = "";
     DynamicJsonBuffer jsonBuffer;  
 
     // If anything comes in Serial (USB)
-    btserial.readBytesUntil(';', serialbuffer, sizeof(serialbuffer));
-            
-    Serial.print("serialbuffer = ");
-    Serial.println(serialbuffer);
-    Serial.print("btserial.read() = ");
-    Serial.println(btserial.read());
+    Serial.readBytesUntil(';', serialbuffer, sizeof(serialbuffer));
     
     // Test if parsing succeeds.
     // Example: {"pan":1385,"steering":1640,"throttle":1490};
@@ -95,8 +75,6 @@ void loop()
     if (!root.success())
     {
       // Nothing is sent
-      Serial.print(serialbuffer);
-      Serial.println(" not JSON structure!");
       return;
     }
     else
