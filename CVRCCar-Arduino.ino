@@ -25,15 +25,15 @@ void setup()
   Serial.begin(SERIALBAUDRATE);
   
   // attaches pan servo
-  panservo.attach(PANPIN);
+  panservo.attach(PANPIN, 565, 2250);
   set_pan(PANSTRAIGHT);
   
   // attaches steering servo
-  steeringservo.attach(STEERINGPIN);
+  steeringservo.attach(STEERINGPIN, 1340, 1920);
   set_steering(STRAIGHT);
 
   // attaches throttle servo
-  throttleservo.attach(THROTTLEPIN);
+  throttleservo.attach(THROTTLEPIN, 1370, 1560);
   set_throttle(NEUTRAL);
 }
 
