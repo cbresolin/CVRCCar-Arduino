@@ -3,16 +3,9 @@
 */
 
 #include <Servo.h>
-#include <NewPing.h>
 #include <ArduinoJson.h>
 
 #define SERIALBAUDRATE 9600
-#define TRIGGER_PIN  3  
-#define ECHO_PIN     2  
-#define MAX_DISTANCE 200
-#define STOP_DISTANCE 15
-
-NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
 
 #define PANPIN 9
 #define PANSTRAIGHT 1385 // 82°
@@ -67,12 +60,7 @@ void writeservo(Servo servo, int time)
 
 // the loop routine runs over and over again forever:
 void loop()
-{                     
-  
-  // Measure distance to nearest obstacle
-  int dist_to_obstacle = sonar.ping_cm();
-  delay(50);
-  
+{
   if (Serial.available())
   {
     char serialbuffer[45] = "";
@@ -89,7 +77,7 @@ void loop()
       // Nothing is sent
       return;
     }
-    else if (dist_to_obstacle >= STOP_DISTANCE)
+    else
     {
       // Act on pan
       set_pan(root["pan"]);
@@ -99,11 +87,6 @@ void loop()
 
       // Act on throttle
       set_throttle(root["throttle"]);
-    }
-    else
-    {
-      // Act on throttle
-      set_throttle(NEUTRAL);
     }
   }
 }
