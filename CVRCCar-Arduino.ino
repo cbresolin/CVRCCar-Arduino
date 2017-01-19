@@ -3,15 +3,20 @@
 #include <ArduinoJson.h>
 
 #define SERIALBAUDRATE 9600
-#define TRIGGERPIN 4
-#define ECHOPIN 7
-#define MAXDISTANCE 150 // 1.5 meters
-#define STOPDISTANCE 15 // 15 centimeters
+#define SONAR_NUM     2   // Number or sensors.
+#define MAX_DISTANCE  30  // Max distance in cm.
+#define PING_INTERVAL 100 // Milliseconds between pings.
 
-NewPing sonar(TRIGGERPIN, ECHOPIN, MAXDISTANCE);
+unsigned long pingTimer[SONAR_NUM]; // When each pings.
+unsigned int cm[SONAR_NUM];         // Store ping distances.
+uint8_t currentSensor = 0;          // Which sensor is active.
+String id[SONAR_NUM] = {"L", "R"};  // Store sonar names (Left, Right)
+boolean is_obstacle = false;
 
-unsigned int pingSpeed = 500; // How frequently are we going to send out a ping (in milliseconds). 50ms would be 20 times a second.
-unsigned long pingTimer;       // Holds the next ping time.
+NewPing sonar[SONAR_NUM] = { // Sensor object array.
+  NewPing(2, 3, MAX_DISTANCE),
+  NewPing(4, 5, MAX_DISTANCE)
+};
 
 #define PANPIN 9
 #define PANSTRAIGHT 1385 // 82°
@@ -42,7 +47,9 @@ void setup()
   throttleservo.attach(THROTTLEPIN, 1370, 1560);
   set_throttle(NEUTRAL);
 
-  pingTimer = millis(); // Start now.
+  pingTimer[0] = millis() + 75; // First ping start in ms.
+  for (uint8_t i = 1; i < SONAR_NUM; i++)
+    pingTimer[i] = pingTimer[i - 1] + PING_INTERVAL;
 }
 
 void set_pan(int pwm)
@@ -66,24 +73,41 @@ void writeservo(Servo servo, int time)
   delay(15);
 }
 
-void echoCheck()
-{ // Timer2 interrupt calls this function every 24uS where you can check the ping status.
-  if (sonar.check_timer())
-  { // This is how you check to see if the ping was received.
-    int unsigned dist = NewPingConvert(sonar.ping_result, US_ROUNDTRIP_CM);
-    Serial.println(dist); // Ping returned, uS result in ping_result, convert to cm with US_ROUNDTRIP_CM.
+void sonarloop() {
+  is_obstacle = false;
+  for (uint8_t i = 0; i < SONAR_NUM; i++) {
+    if (millis() >= pingTimer[i]) {
+      pingTimer[i] += PING_INTERVAL * SONAR_NUM;
+      if (i == 0 && currentSensor == SONAR_NUM - 1)
+        oneSensorCycle(); // Do something with results.
+      sonar[currentSensor].timer_stop();
+      currentSensor = i;
+      cm[currentSensor] = 0;
+      sonar[currentSensor].ping_timer(echoCheck);
+    }
   }
 }
-
-// the loop routine runs over and over again forever:
-void loop()
-{
-  // Notice how there's no delays in this sketch to allow you to do other processing in-line while doing distance pings.
-  if (millis() >= pingTimer) {   // pingSpeed milliseconds since last ping, do another ping.
-    pingTimer += pingSpeed;      // Set the next ping time.
-    sonar.ping_timer(echoCheck); // Send out the ping, calls "echoCheck" function every 24uS where you can check the ping status.
+ 
+void echoCheck() { // If ping echo, set distance to array.
+  if (sonar[currentSensor].check_timer())
+    cm[currentSensor] = sonar[currentSensor].ping_result / US_ROUNDTRIP_CM;
+}
+ 
+void oneSensorCycle() { 
+  // Do something with the results.
+  for (uint8_t i = 0; i < SONAR_NUM; i++) {
+    if (cm[i] != 0)
+       is_obstacle = true;    
+    Serial.print(id[i]);
+    Serial.print("=");
+    Serial.print(cm[i]);
+    Serial.print(" ");
   }
-  
+  Serial.println();
+}
+
+void driveloop()
+{ 
   if (Serial.available())
   {
     char serialbuffer[45] = "";
@@ -109,8 +133,21 @@ void loop()
       set_steering(root["steering"]);
 
       // Act on throttle
-      set_throttle(root["throttle"]);
+      if (is_obstacle)
+      {
+        set_throttle(NEUTRAL);
+      }
+      else
+      {
+        set_throttle(root["throttle"]);
+      }
     }
   }
 }
 
+// the loop routine runs over and over again forever:
+void loop()
+{
+  sonarloop();
+  driveloop();
+}
