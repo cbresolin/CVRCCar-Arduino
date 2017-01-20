@@ -5,7 +5,7 @@
 #define SERIALBAUDRATE 9600
 #define SONAR_NUM     2   // Number or sensors.
 #define MAX_DISTANCE  30  // Max distance in cm.
-#define PING_INTERVAL 100 // Milliseconds between pings.
+#define PING_INTERVAL 500 // Milliseconds between pings.
 
 unsigned long pingTimer[SONAR_NUM]; // When each pings.
 unsigned int cm[SONAR_NUM];         // Store ping distances.
@@ -82,6 +82,7 @@ void sonarloop() {
         oneSensorCycle(); // Do something with results.
       sonar[currentSensor].timer_stop();
       currentSensor = i;
+      // cm[currentSensor] = sonar[currentSensor].ping_median(3) / US_ROUNDTRIP_CM;
       cm[currentSensor] = 0;
       sonar[currentSensor].ping_timer(echoCheck);
     }
@@ -95,18 +96,20 @@ void echoCheck() { // If ping echo, set distance to array.
  
 void oneSensorCycle() { 
   // Do something with the results.
-  for (uint8_t i = 0; i < SONAR_NUM; i++) {
+  for (uint8_t i = 0; i < SONAR_NUM; i++)
+  {
     if (cm[i] != 0)
-       is_obstacle = true;    
-    Serial.print(id[i]);
-    Serial.print("=");
-    Serial.print(cm[i]);
-    Serial.print(" ");
+       is_obstacle = true;
+
+//    Serial.print(id[i]);
+//    Serial.print("=");
+//    Serial.print(cm[i]);
+//    Serial.print(" ");
   }
-  Serial.println();
+  Serial.println(is_obstacle);
 }
 
-void driveloop()
+void drive()
 { 
   if (Serial.available())
   {
@@ -131,16 +134,9 @@ void driveloop()
         
       // Act on steering
       set_steering(root["steering"]);
-
+      
       // Act on throttle
-      if (is_obstacle)
-      {
-        set_throttle(NEUTRAL);
-      }
-      else
-      {
-        set_throttle(root["throttle"]);
-      }
+      set_throttle(root["throttle"]);  
     }
   }
 }
@@ -149,5 +145,5 @@ void driveloop()
 void loop()
 {
   sonarloop();
-  driveloop();
+  drive();
 }
