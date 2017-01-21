@@ -5,7 +5,7 @@
 #define SERIALBAUDRATE 9600
 #define SONAR_NUM     2   // Number or sensors.
 #define MAX_DISTANCE  30  // Max distance in cm.
-#define PING_INTERVAL 500 // Milliseconds between pings.
+#define PING_INTERVAL 150 // Milliseconds between pings.
 
 unsigned long pingTimer[SONAR_NUM]; // When each pings.
 unsigned int cm[SONAR_NUM];         // Store ping distances.
