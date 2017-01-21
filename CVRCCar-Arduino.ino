@@ -106,7 +106,7 @@ void oneSensorCycle() {
 //    Serial.print(cm[i]);
 //    Serial.print(" ");
   }
-  Serial.println(is_obstacle);
+  Serial.print(is_obstacle);
 }
 
 void drive()
