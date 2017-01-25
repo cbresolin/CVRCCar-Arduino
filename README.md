@@ -13,21 +13,25 @@ PWM values are sent to the Arduino by an Android app.
 Communication between the Android app and the Arduino is serial.
 
 # Features
-**BT Communication**
+## BT Communication
 Hardware serial is used for communication using an HC-05 Bluetooth module.
 This module is plugged into pin 0 (RX) & 1 (TX) of serial. BT communication enables
 free movements of Android smartphone used to track an object (pan servo).
 
-**PWM**
+## PWM
 The 3 PWM values are sent using a JSON structure to the Arduino.
 If the serial buffer is not interpreted as valid JSON structure, it is ignored.
 
-**Obstacle detection**
+## Obstacle detection
 2 HC-SR04 ultrasonic sensors are installed at the front of the RC car.
 They have both a limit detection range of 30cm. Beyond that limit, no echoes
-are returned. If an echo is returned, this means that an obstacle is in front
+are returned.
+
+If an echo is returned, this means that an obstacle is in front
 of the car. In that case, this information is sent (via BT) to the Android app
-to take care of. Currently the Android app sets to neutral car's throttle when
+to take care of.
+
+Currently the Android app sets to neutral car's throttle when
 an obstacle is detected.
 
 # Libraries
