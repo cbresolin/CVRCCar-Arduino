@@ -1,6 +1,8 @@
 # CVRCCar-Arduino
 Arduino code controlling a RC model car and detecting obstacles
 
+![img_1097](https://cloud.githubusercontent.com/assets/19686240/22289701/4f6b66a2-e2fd-11e6-86bc-d92de522154c.JPG)
+
 # Presentation
 This project controls a RC car, sending PWM values to its 3 servo motors.
 - throttle
@@ -11,6 +13,9 @@ Range of PWM values is determined by each servos.
 PWM values are sent to the Arduino by an Android app.
 (See https://github.com/cbresolin/CVRCCar-Android for more details)
 Communication between the Android app and the Arduino is serial.
+Arduino Uno board is powered using output of car's ESC controller.
+
+![img_1095](https://cloud.githubusercontent.com/assets/19686240/22289767/8f5d2bc4-e2fd-11e6-9c2a-da67f85e0105.JPG)
 
 # Features
 ## BT Communication
